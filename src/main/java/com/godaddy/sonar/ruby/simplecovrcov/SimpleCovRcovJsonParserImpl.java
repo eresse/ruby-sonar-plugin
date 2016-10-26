@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.io.FileUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.measures.CoverageMeasuresBuilder;
@@ -27,23 +29,26 @@ public class SimpleCovRcovJsonParserImpl implements SimpleCovRcovJsonParser
 
         String fileString = FileUtils.readFileToString(fileToFindCoverage, "UTF-8");
 
-        JSONObject resultJsonObject = (JSONObject) JSONValue.parse(fileString);
-        JSONObject coverageJsonObj = (JSONObject) ((JSONObject) resultJsonObject.get("RSpec")).get("coverage");
+	JsonParser p = new JsonParser();
+	JsonObject resultJsonObject = p.parse(fileString).getAsJsonObject();
+	JsonObject coverageJsonObj = resultJsonObject.get("RSpec").getAsJsonObject().get("coverage").getAsJsonObject();
 
         // for each file in the coverage report
-        for (int j = 0; j < coverageJsonObj.keySet().size(); j++)
+        for (int j = 0; j < coverageJsonObj.entrySet().size(); j++)
         {
             CoverageMeasuresBuilder fileCoverage = CoverageMeasuresBuilder.create();
 
-            String filePath = coverageJsonObj.keySet().toArray()[j].toString();
+            String filePath = ((Map.Entry)coverageJsonObj.entrySet().toArray()[j]).getKey().toString();
         	LOG.debug("filePath " + filePath);
 
-            JSONArray coverageArray = (JSONArray) coverageJsonObj.get(coverageJsonObj.keySet().toArray()[j]);
+            JsonArray coverageArray = coverageJsonObj.get(filePath).getAsJsonArray();
 
             // for each line in the coverage array
             for (int i = 0; i < coverageArray.size(); i++)
             {
-                Long line = (Long) coverageArray.toArray()[i];
+		Long line = null;
+		if(!coverageArray.get(i).isJsonNull()) { line = coverageArray.get(i).getAsLong(); }
+
                 Integer intLine = 0;
                 int lineNumber = i + 1;
                 if (line != null)
