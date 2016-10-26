@@ -31,35 +31,45 @@ public class SimpleCovRcovJsonParserImpl implements SimpleCovRcovJsonParser
 
 	JsonParser p = new JsonParser();
 	JsonObject resultJsonObject = p.parse(fileString).getAsJsonObject();
-	JsonObject coverageJsonObj = resultJsonObject.get("RSpec").getAsJsonObject().get("coverage").getAsJsonObject();
 
-        // for each file in the coverage report
-        for (int j = 0; j < coverageJsonObj.entrySet().size(); j++)
-        {
-            CoverageMeasuresBuilder fileCoverage = CoverageMeasuresBuilder.create();
+	// Determine Root Node
+	String coverageRootNode = "";
+	if(resultJsonObject.get("RSpec") != null) { coverageRootNode = "RSpec"; }
+	if(resultJsonObject.get("MiniTest") != null) { coverageRootNode = "MiniTest"; }
 
-            String filePath = ((Map.Entry)coverageJsonObj.entrySet().toArray()[j]).getKey().toString();
-        	LOG.debug("filePath " + filePath);
+	// Check Coverage Root Node
+	if(!(coverageRootNode.equals("")))
+	{
+		JsonObject coverageJsonObj = resultJsonObject.get(coverageRootNode).getAsJsonObject().get("coverage").getAsJsonObject();
 
-            JsonArray coverageArray = coverageJsonObj.get(filePath).getAsJsonArray();
+	        // for each file in the coverage report
+	        for (int j = 0; j < coverageJsonObj.entrySet().size(); j++)
+	        {
+	            CoverageMeasuresBuilder fileCoverage = CoverageMeasuresBuilder.create();
 
-            // for each line in the coverage array
-            for (int i = 0; i < coverageArray.size(); i++)
-            {
-		Long line = null;
-		if(!coverageArray.get(i).isJsonNull()) { line = coverageArray.get(i).getAsLong(); }
+	            String filePath = ((Map.Entry)coverageJsonObj.entrySet().toArray()[j]).getKey().toString();
+	        	LOG.debug("filePath " + filePath);
 
-                Integer intLine = 0;
-                int lineNumber = i + 1;
-                if (line != null)
-                {
-                    intLine = line.intValue();
-                    fileCoverage.setHits(lineNumber, intLine);
-                }
-            }
-            LOG.info("FILE COVERAGE = " + fileCoverage.getCoveredLines());
-            coveredFiles.put(filePath, fileCoverage);
-        }
+	            JsonArray coverageArray = coverageJsonObj.get(filePath).getAsJsonArray();
+
+	            // for each line in the coverage array
+	            for (int i = 0; i < coverageArray.size(); i++)
+	            {
+			Long line = null;
+			if(!coverageArray.get(i).isJsonNull()) { line = coverageArray.get(i).getAsLong(); }
+
+	                Integer intLine = 0;
+	                int lineNumber = i + 1;
+	                if (line != null)
+	                {
+	                    intLine = line.intValue();
+	                    fileCoverage.setHits(lineNumber, intLine);
+	                }
+	            }
+	            LOG.info("FILE COVERAGE = " + fileCoverage.getCoveredLines());
+	            coveredFiles.put(filePath, fileCoverage);
+	        }
+	}
         return coveredFiles;
     }
 }
