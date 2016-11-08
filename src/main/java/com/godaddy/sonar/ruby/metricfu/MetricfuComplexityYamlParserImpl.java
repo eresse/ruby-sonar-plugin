@@ -73,7 +73,6 @@ public class MetricfuComplexityYamlParserImpl implements
     List<RubyFunction> rubyFunctionsForFile = new ArrayList<RubyFunction>();
     Map<String, Object> fileInfoToWorkWith = new HashMap<String, Object>();
 
-      LOG.debug("MetricfuComplexityYamlParserImpl: parsing results from saikuro");
       ArrayList<Map<String, Object>> saikuroFilesResult = (ArrayList<Map<String, Object>>) saikuroResult.get(":files");
 
       for (Map<String, Object> fileInfo : saikuroFilesResult)
@@ -118,7 +117,6 @@ public class MetricfuComplexityYamlParserImpl implements
     List<RubyFunction> rubyFunctionsForFile = new ArrayList<RubyFunction>();
     Map<String, Object> fileInfoToWorkWith = new HashMap<String, Object>();
 
-      LOG.debug("MetricfuComplexityYamlParserImpl: parsing results from cane");
       Map<String, Object> caneViolationsResult = (Map<String, Object>) caneResult.get(":violations");
       ArrayList<Map<String, Object>> caneAbcComplexityResult = (ArrayList<Map<String, Object>>) caneViolationsResult.get(":abc_complexity");
 
@@ -140,7 +138,6 @@ public class MetricfuComplexityYamlParserImpl implements
     }
 
     RubyFunction rubyFunction = new RubyFunction();
-    LOG.debug("analyzeCane: fileInfoToWorkWith - " + fileInfoToWorkWith);
     rubyFunction.setName((String) fileInfoToWorkWith.get(":method"));
     rubyFunction.setComplexity(Integer.parseInt( (String)(fileInfoToWorkWith.get(":complexity"))));
     rubyFunctionsForFile.add(rubyFunction);

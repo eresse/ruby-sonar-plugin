@@ -110,7 +110,6 @@ public class SimpleCovRcovSensor implements Sensor
 
   private void calculateMetrics(List<InputFile> sourceFiles, File jsonFile, final SensorContext context) throws IOException
   {
-    LOG.debug(jsonFile.toString());
     Map<String, CoverageMeasuresBuilder> jsonResults = simpleCovRcovJsonParser.parse(jsonFile);
 
     LOG.trace("jsonResults: " + jsonResults);
@@ -119,8 +118,6 @@ public class SimpleCovRcovSensor implements Sensor
     {
       try
       {
-        LOG.debug("SimpleCovRcovSensor processing file: " + inputFile.relativePath());
-
         sourceFile = inputFile.file();
         String jsonKey = inputFile.absolutePath();        
         CoverageMeasuresBuilder fileCoverage = jsonResults.get(jsonKey);        
@@ -129,7 +126,6 @@ public class SimpleCovRcovSensor implements Sensor
         {
           for (Measure measure : fileCoverage.createMeasures())
           {
-            LOG.debug("    Saving measure " + measure.getMetricKey());
             context.saveMeasure(inputFile, measure);
           }
         }

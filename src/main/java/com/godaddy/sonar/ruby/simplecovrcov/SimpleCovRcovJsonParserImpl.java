@@ -48,7 +48,6 @@ public class SimpleCovRcovJsonParserImpl implements SimpleCovRcovJsonParser
 	            CoverageMeasuresBuilder fileCoverage = CoverageMeasuresBuilder.create();
 
 	            String filePath = ((Map.Entry)coverageJsonObj.entrySet().toArray()[j]).getKey().toString();
-	        	LOG.debug("filePath " + filePath);
 
 	            JsonArray coverageArray = coverageJsonObj.get(filePath).getAsJsonArray();
 

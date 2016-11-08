@@ -82,9 +82,7 @@ public class MetricfuComplexitySensor implements Sensor
   {
     LOG.info("functions are set");
     String complexityType = settings.getString(RubyPlugin.METRICFU_COMPLEXITY_METRIC_PROPERTY);
-    List<RubyFunction> functions = metricfuComplexityYamlParser.parseFunctions(inputFile.file().getName(), resultsFile,
-        complexityType);
-
+    List<RubyFunction> functions = metricfuComplexityYamlParser.parseFunctions(inputFile.file().getName(), resultsFile, "Saikuro");
     // if function list is empty, then return, do not compute any complexity
     // on that file
     if (functions.isEmpty() || functions.size() == 0 || functions == null)
@@ -100,17 +98,14 @@ public class MetricfuComplexitySensor implements Sensor
       fileComplexity += function.getComplexity();
       LOG.info("File complexity " + fileComplexity);
     }
+    sensorContext.saveMeasure(inputFile, CoreMetrics.COMPLEXITY, Double.valueOf(fileComplexity));
+    sensorContext.saveMeasure(inputFile, CoreMetrics.COMPLEXITY_IN_FUNCTIONS, Double.valueOf(fileComplexity) / functions.size());
 
-    RangeDistributionBuilder fileDistribution = new RangeDistributionBuilder(CoreMetrics.FILE_COMPLEXITY_DISTRIBUTION,
-        FILES_DISTRIB_BOTTOM_LIMITS);
+    RangeDistributionBuilder fileDistribution = new RangeDistributionBuilder(CoreMetrics.FILE_COMPLEXITY_DISTRIBUTION, FILES_DISTRIB_BOTTOM_LIMITS);
     fileDistribution.add(Double.valueOf(fileComplexity));
     sensorContext.saveMeasure(inputFile, fileDistribution.build().setPersistenceMode(PersistenceMode.MEMORY));
 
-    sensorContext.saveMeasure(inputFile, CoreMetrics.FUNCTION_COMPLEXITY,
-        Double.valueOf(fileComplexity) / functions.size());
-
-    RangeDistributionBuilder functionDistribution = new RangeDistributionBuilder(
-        CoreMetrics.FUNCTION_COMPLEXITY_DISTRIBUTION, FUNCTIONS_DISTRIB_BOTTOM_LIMITS);
+    RangeDistributionBuilder functionDistribution = new RangeDistributionBuilder(CoreMetrics.FUNCTION_COMPLEXITY_DISTRIBUTION, FUNCTIONS_DISTRIB_BOTTOM_LIMITS);
     for (RubyFunction function : functions)
     {
       functionDistribution.add(Double.valueOf(function.getComplexity()));
