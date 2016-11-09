@@ -82,7 +82,7 @@ public class RubySensor implements Sensor
     }
     for (RubyPackage pack : packageList)
     {
-      sensorContext.saveMeasure(pack, CoreMetrics.PACKAGES, 1.0);
+      sensorContext.saveMeasure(pack, CoreMetrics.DIRECTORIES, 1.0);
     }
   }
 
